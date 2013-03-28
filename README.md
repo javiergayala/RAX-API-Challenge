@@ -26,6 +26,7 @@ __Goal:__ Write a script that builds three 512MB Cloud Servers that follow a sim
 	  -dfw                  Perform action in DFW
 	  -ord                  Perform action in ORD
 	  -lon                  Perform action in LON
+	  -d                    Show debug info, such as HTTP responses
 	  -V, --version         show program's version number and exit
 	  
 ## Challenge 4 _(challenge4.py)_ ##
@@ -40,11 +41,14 @@ __Goal:__ Write a script that uses Cloud DNS to create a new A record when passe
 	  -h, --help            show this help message and exit
 	  -c CONFIGFILE, --config CONFIGFILE
 	                        Location of the config file
-	  -dls, --list-domains  List Domain Names in DNS
-	  -da AFQDN, --add-a-record AFQDN
+	  -ld, --list-domains   List Domain Names in DNS
+	  -a AFQDN, --a-record AFQDN
 	                        FQDN for new A record
-	  -dip AIP, --add-a-ip AIP
+	  -ip AIP, --add-a-ip AIP
 	                        IP for new A record
+	  -dn DOMAIN_NAME, --domain-name DOMAIN_NAME
+	                        Domain
+	  -d                    Debug
 	  -V, --version         show program's version number and exit
 	  
 ## Requirements ##

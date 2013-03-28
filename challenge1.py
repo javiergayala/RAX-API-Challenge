@@ -24,6 +24,7 @@ raxParse.add_argument('-sn', '--server-name', dest='svrBaseName', help="Base nam
 raxParse.add_argument('-dfw', action='store_true', help='Perform action in DFW')
 raxParse.add_argument('-ord', action='store_true', help='Perform action in ORD')
 raxParse.add_argument('-lon', action='store_true', help='Perform action in LON')
+raxParse.add_argument('-d', dest='debug', action='store_true', help="Show debug info, such as HTTP responses")
 raxParse.add_argument('-V', '--version', action='version', version='%(prog)s 0.1 by Javier Ayala')
 raxArgs = raxParse.parse_args()
 
@@ -127,7 +128,9 @@ def raxCreateServer(dc):
                 print 'Networks: %s' % server.networks
                 print 'Password: %s' % server.adminPass
                 completed.append(name)
-
+if (len(sys.argv) == 1):
+    raxParse.print_usage()
+    sys.exit()
 
 try:
     pyrax.set_credential_file(raxArgs.configFile)
@@ -139,6 +142,8 @@ except exc.FileNotFound:
     print bcolors.WARNING + "No config file found: " + str(raxArgs.configFile) + bcolors.ENDC
     raxLoginPrompt()
 
+if raxArgs.debug:
+    pyrax.set_http_debug(True)
 if raxArgs.list_servers:
     raxListServers()
 if raxArgs.create_server:
