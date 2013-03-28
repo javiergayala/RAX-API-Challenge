@@ -15,7 +15,7 @@ from helpers import bcolors, raxLogin
 defConfigFile = os.path.expanduser('~') + '/.pyrax.cfg'
 
 # Argument Parsing
-raxParse = argparse.ArgumentParser(description='Challenge 1 of the API Challenge')
+raxParse = argparse.ArgumentParser(description='Challenge 2 of the API Challenge')
 raxParse.add_argument('-c', '--config', dest='configFile', help="Location of the config file", default=defConfigFile)
 raxParse.add_argument('-ls', '--list-servers', action='store_true', help="List Cloud Servers")
 raxParse.add_argument('-cs', '--create-server', action='store_true', help="Create Server")
@@ -31,31 +31,32 @@ raxArgs = raxParse.parse_args()
 # See if there is a pyrax.cfg file
 configFileTest = os.path.isfile(raxArgs.configFile)
 
-def raxListServers():
-    if (raxArgs.dfw or raxArgs.ord or raxArgs.lon):
-        ls_pp = pprint.PrettyPrinter(indent=4)
-        # Print Server List
-        print ""
-        print bcolors.HEADER + "Server List"
-        print "===========" + bcolors.ENDC
-    else:
-        print bcolors.FAIL + 'You MUST specify a DC' + bcolors.ENDC
+def raxListServers(dc):
     # Connect to Cloud Servers via dc
-    if raxArgs.dfw:
-        cs_dfw = pyrax.connect_to_cloudservers(region="DFW")
-        dfw_servers = cs_dfw.servers.list()
-        print "DFW: "
-        ls_pp.pprint(dfw_servers)
-    if raxArgs.ord:
-        cs_ord = pyrax.connect_to_cloudservers(region="ORD")
-        ord_servers = cs_ord.servers.list()
-        print "ORD: "
-        ls_pp.pprint(ord_servers)
-    if raxArgs.lon:
-        cs_lon = pyrax.connect_to_cloudservers(region="LON")
-        lon_servers = cs_lon.servers.list()
-        print "LON: " 
-        ls_pp.pprint(lon_servers)
+    cs = pyrax.connect_to_cloudservers(region=dc)
+    servers = cs.servers.list()
+    server_dict = {}
+    print "%(header)s Select a server to clone from: %(endc)s" % {"header": bcolors.HEADER, "endc": bcolors.ENDC}
+    for pos, srv in enumerate(servers):
+        print "%s: %s" % (pos, srv.name)
+        server_dict[str(pos)] = srv.id
+    srv2img = None
+    while srv2img not in server_dict:
+        if srv2img is not None:
+            print "  -- Invalid choice"
+        srv2img = raw_input("Enter the number for your choice: ")
+
+    srv2imgId = server_dict[srv2img]
+    print
+    imgName = raw_input("Enter a name for the image: ")
+
+    imgId = cs.servers.create_image(srv2imgId, imgName)
+    print "Image '%s' is being created with ID '%s'" % (imgName, imgId)
+
+def raxGetImgStatus(dc, imgId):
+    cs = pyrax.connect_to_cloudservers(region=dc)
+    imgStatus = cs.images.get(imgId)
+    print str(imgStatus)
 
 def raxCreateServer(dc):
     raxCldSvr = pyrax.connect_to_cloudservers(region=dc)
@@ -126,13 +127,13 @@ except:
 if raxArgs.debug:
     pyrax.set_http_debug(True)
 if raxArgs.list_servers:
-    raxListServers()
+    raxGetImgStatus('ORD', raxArgs.numServers)
 if raxArgs.create_server:
     if raxArgs.dfw:
-        raxCreateServer('DFW')
+        raxListServers('DFW')
     if raxArgs.ord:
-        raxCreateServer('ORD')
+        raxListServers('ORD')
     if raxArgs.lon:
-        raxCreateServer('lon')
+        raxListServers('lon')
 
 

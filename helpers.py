@@ -28,7 +28,7 @@ class raxLogin(object):
     def __init__(self, configFile):
         super(raxLogin, self).__init__()
         self.configFile = configFile
-        #print "Config file: %s" % self.configFile
+    #print "Config file: %s" % self.configFile
     
     def authenticate(self):
         try:
