@@ -4,12 +4,11 @@ import sys
 import time
 import re
 import argparse
-import getpass
 import socket
 import pprint
 import pyrax
 import pyrax.exceptions as exc
-from bcolors import bcolors
+from helpers import bcolors, raxLogin
 
 # Pre-defined Variables
 defConfigFile = os.path.expanduser('~') + '/.pyrax.cfg'
@@ -25,25 +24,8 @@ raxParse.add_argument('-d', dest='debug', action='store_true', help="Show debug 
 raxParse.add_argument('-V', '--version', action='version', version='%(prog)s 0.1 by Javier Ayala')
 raxArgs = raxParse.parse_args()
 
-
-
-
-
 # See if there is a pyrax.cfg file
 configFileTest = os.path.isfile(raxArgs.configFile)
-
-
-
-def raxLoginPrompt():
-    raxUser = raw_input('Username: ')
-    raxAPIKey = getpass.getpass('API Key: ')
-    try:
-        pyrax.set_credentials(raxUser, raxAPIKey)
-        print bcolors.OKBLUE + "Authentication SUCCEEDED!" + bcolors.ENDC
-    except exc.AuthenticationFailed:
-        print bcolors.FAIL + "Authentication Failed using the Username and API Key provided!" + bcolors.ENDC
-        sys.exit(1)
-
 
 def isFQDN(hostname):
     if len(hostname) > 255:
@@ -64,12 +46,15 @@ def isIP(ipAddr):
 
 def raxListDomains():
     for domain in raxDns.get_domain_iterator():
-        #print '%(id)s: %(name)s' % {"id" : str(domain.id), "name" : domain.name}
         print '%(name)s' % {"name" : domain.name}
     dom = raw_input('Choose a domain to view records, or \'q\' to quit: ')
     if (dom == 'q'):
         sys.exit()
-    domId = raxDns.find(name=dom)
+    try:
+        domId = raxDns.find(name=dom)
+    except exc.NotFound:
+        print "%(fail)s%(dom)s not found %(endc)s" % {"fail": bcolors.FAIL, "dom": dom, "endc": bcolors.ENDC}
+        sys.exit(1)
     recs = raxDns.list_records(domId)
     for rec in recs:
         print rec
@@ -108,17 +93,12 @@ if (len(sys.argv) == 1):
     sys.exit()
 
 try:
-    pyrax.set_credential_file(raxArgs.configFile)
-    print bcolors.OKBLUE + "Authentication SUCCEEDED!" + bcolors.ENDC
-except exc.AuthenticationFailed:
-    print bcolors.FAIL + "Authentication Failed using the credentials in " + str(raxArgs.configFile) + bcolors.ENDC
-    raxLoginPrompt()
-except exc.FileNotFound:
-    print bcolors.WARNING + "No config file found: " + str(raxArgs.configFile) + bcolors.ENDC
-    raxLoginPrompt()
-finally:
+    myLogin = raxLogin(raxArgs.configFile)
+    myLogin.authenticate()
     raxDns = pyrax.cloud_dns
-
+except:
+    print bcolors.FAIL + "Couldn't login" + bcolors.ENDC
+    sys.exit()
 
 if raxArgs.debug:
     pyrax.set_http_debug(True)
