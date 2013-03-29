@@ -29,6 +29,31 @@ __Goal:__ Write a script that builds three 512MB Cloud Servers that follow a sim
 	  -d                    Show debug info, such as HTTP responses
 	  -V, --version         show program's version number and exit
 	  
+## Challenge 2 _(challenge2.py)_ ##
+
+__Goal:__ Write a script that clones a server (takes an image and deploys the image as a new server).
+
+	usage: challenge2.py [-h] [-c CONFIGFILE] [-ci] [-cs] [-ns NUMSERVERS]
+                     [-sn SVRBASENAME] [-dfw] [-ord] [-lon] [-d] [-V]
+
+	Challenge 2 of the API Challenge
+	
+	optional arguments:
+	  -h, --help            show this help message and exit
+	  -c CONFIGFILE, --config CONFIGFILE
+	                        Location of the config file
+	  -ci, --create-image   Create an Image from a server
+	  -cs, --create-server  Create Server
+	  -ns NUMSERVERS, --number-of-servers NUMSERVERS
+	                        Number of servers
+	  -sn SVRBASENAME, --server-name SVRBASENAME
+	                        Base name of servers
+	  -dfw                  Perform action in DFW
+	  -ord                  Perform action in ORD
+	  -lon                  Perform action in LON
+	  -d                    Show debug info, such as HTTP responses
+	  -V, --version         show program's version number and exit
+	  
 ## Challenge 4 _(challenge4.py)_ ##
 
 __Goal:__ Write a script that uses Cloud DNS to create a new A record when passed a FQDN and IP address as arguments.  

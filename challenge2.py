@@ -57,7 +57,7 @@ def raxCloneSvr(dc):
     return imgId
 
 def raxCreateServer(dc, imgIDToUse):
-"""Provided an Image ID, create cloned server(s) from the image."""
+    """Provided an Image ID, create cloned server(s) from the image."""
     numSvrsCreated = 0 # Counter for the number of servers that get created by the script
     svrsCreated = {} # Dictionary to hold info on the servers that get created
     completed = [] # Array to hold the servers that complete creation

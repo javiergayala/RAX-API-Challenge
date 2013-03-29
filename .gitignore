@@ -18,6 +18,11 @@ develop-eggs
 lib
 lib64
 
+# added for Virtualenv stuff
+include
+novaclient
+.Python
+
 # Installer logs
 pip-log.txt
 
