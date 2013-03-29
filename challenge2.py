@@ -17,7 +17,7 @@ defConfigFile = os.path.expanduser('~') + '/.pyrax.cfg'
 # Argument Parsing
 raxParse = argparse.ArgumentParser(description='Challenge 2 of the API Challenge')
 raxParse.add_argument('-c', '--config', dest='configFile', help="Location of the config file", default=defConfigFile)
-raxParse.add_argument('-ls', '--list-servers', action='store_true', help="List Cloud Servers")
+raxParse.add_argument('-ci', '--create-image', action='store_true', help="Create an Image from a server")
 raxParse.add_argument('-cs', '--create-server', action='store_true', help="Create Server")
 raxParse.add_argument('-ns', '--number-of-servers', dest='numServers', help="Number of servers")
 raxParse.add_argument('-sn', '--server-name', dest='svrBaseName', help="Base name of servers")
@@ -31,10 +31,12 @@ raxArgs = raxParse.parse_args()
 # See if there is a pyrax.cfg file
 configFileTest = os.path.isfile(raxArgs.configFile)
 
-def raxListServers(dc):
-    # Connect to Cloud Servers via dc
-    cs = pyrax.connect_to_cloudservers(region=dc)
+def raxCloneSvr(dc):
+    """List existing servers, then prompt the user to choose a server from which to create an image."""
     servers = cs.servers.list()
+    if (len(servers) < 1):
+        print "%(fail)sNo servers to clone from in %(dc)s! %(endc)s" % {"fail": bcolors.FAIL, "dc": dc, "endc": bcolors.ENDC}
+        sys.exit(1)
     server_dict = {}
     print "%(header)s Select a server to clone from: %(endc)s" % {"header": bcolors.HEADER, "endc": bcolors.ENDC}
     for pos, srv in enumerate(servers):
@@ -52,29 +54,19 @@ def raxListServers(dc):
 
     imgId = cs.servers.create_image(srv2imgId, imgName)
     print "Image '%s' is being created with ID '%s'" % (imgName, imgId)
+    return imgId
 
-def raxGetImgStatus(dc, imgId):
-    cs = pyrax.connect_to_cloudservers(region=dc)
-    imgStatus = cs.images.get(imgId)
-    print str(imgStatus)
-
-def raxCreateServer(dc):
-    raxCldSvr = pyrax.connect_to_cloudservers(region=dc)
-    serverImgs = raxCldSvr.images.list()
+def raxCreateServer(dc, imgIDToUse):
+"""Provided an Image ID, create cloned server(s) from the image."""
     numSvrsCreated = 0 # Counter for the number of servers that get created by the script
     svrsCreated = {} # Dictionary to hold info on the servers that get created
     completed = [] # Array to hold the servers that complete creation
-    for img in sorted(serverImgs, key=lambda serverImgs: serverImgs.name):
-        print img.name, " || ID:", img.id
-    imgIDToUse = raw_input('ID of image to use: ')
-    imgNameToUse = [img.name for img in serverImgs if img.id == imgIDToUse][0]
-    #print str(imgToUse)
-    serverFlvrs = raxCldSvr.flavors.list()
+    serverFlvrs = cs.flavors.list()
+    print "%(header)s Select a flavor to use: %(endc)s" % {"header": bcolors.HEADER, "endc": bcolors.ENDC}
     for flvr in serverFlvrs:
         print "Name: " + flvr.name + " || ID:" + flvr.id
     flvrIDToUse = raw_input('ID of flavor to use: ')
     flvrNameToUse = [flvr.name for flvr in serverFlvrs if flvr.id == flvrIDToUse][0]
-    print 'Using ' + bcolors.OKBLUE + imgNameToUse + bcolors.ENDC
     try:
         numServers = int(raxArgs.numServers)
     except (ValueError, TypeError) as e:
@@ -83,13 +75,22 @@ def raxCreateServer(dc):
         svrBaseName = raw_input('What is the server base name to use: ')
     else:
         svrBaseName = raxArgs.svrBaseName
-    print 'Creating a new ' + bcolors.OKBLUE + flvrNameToUse + bcolors.ENDC + ' with ' + bcolors.OKBLUE + imgNameToUse + bcolors.ENDC + ' in ' + bcolors.WARNING + dc + bcolors.ENDC + '.'
+    print 'Creating a new ' + bcolors.OKBLUE + flvrNameToUse + bcolors.ENDC + ' from Image ID ' + bcolors.OKBLUE + imgIDToUse + bcolors.ENDC + ' in ' + bcolors.WARNING + dc + bcolors.ENDC + '.'
     print 'Creating ' + str(numServers) + ' servers.'
     print 'Server name will begin with ' + svrBaseName
-
+    imgReady = False
+    while (imgReady == False):
+        image = [img for img in cs.images.list() if imgIDToUse in img.id][0]
+        print "Waiting for image '%(name)s' to become active: %(progress)s%%" % {"name": image.name, "progress": image.progress}
+        if image.status == 'ACTIVE':
+            print "Image is ready"
+            imgReady = True
+        else:
+            time.sleep(10)
+            image.get()
     for i in xrange(0, numServers):
         svrName = '%s%s' % (svrBaseName, i)
-        svrsCreated[svrName] = raxCldSvr.servers.create(svrName, imgIDToUse, flvrIDToUse)
+        svrsCreated[svrName] = cs.servers.create(svrName, imgIDToUse, flvrIDToUse)
         print "Created server: %s" % svrName
     sys.stdout.write("Waiting for builds to complete")
     sys.stdout.flush()
@@ -117,23 +118,36 @@ if (len(sys.argv) == 1):
     raxParse.print_usage()
     sys.exit()
 
+
+if raxArgs.dfw:
+    dc = 'DFW'
+elif raxArgs.ord:
+    dc = 'ORD'
+elif raxArgs.lon:
+    dc = 'LON'
+else:
+    print "%(fail)sMust define the DC!%(endc)s" % {"fail": bcolors.FAIL, "endc": bcolors.ENDC}
+    sys.exit(1)
+
 try:
     myLogin = raxLogin(raxArgs.configFile)
     myLogin.authenticate()
 except:
     print bcolors.FAIL + "Couldn't login" + bcolors.ENDC
-    sys.exit()
+    sys.exit(2)
+
+cs = pyrax.connect_to_cloudservers(region=dc)
 
 if raxArgs.debug:
     pyrax.set_http_debug(True)
-if raxArgs.list_servers:
-    raxGetImgStatus('ORD', raxArgs.numServers)
+if raxArgs.create_image:
+    raxCloneSvr(dc)
 if raxArgs.create_server:
-    if raxArgs.dfw:
-        raxListServers('DFW')
-    if raxArgs.ord:
-        raxListServers('ORD')
-    if raxArgs.lon:
-        raxListServers('lon')
+    try:
+        cloneImage = raxCloneSvr(dc)
+    except:
+        print "%(fail)sCouldn't clone server!%(endc)s" % {"fail": bcolors.FAIL, "endc": bcolors.ENDC}
+        sys.exit(1)
+    raxCreateServer(dc, cloneImage)
 
 

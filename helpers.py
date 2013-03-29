@@ -23,6 +23,7 @@ class bcolors():
         self.FAIL = ''
         self.ENDC = ''
 
+
 class raxLogin(object):
     """Provides functionality for logging into the API"""
     def __init__(self, configFile):
@@ -31,6 +32,7 @@ class raxLogin(object):
     #print "Config file: %s" % self.configFile
     
     def authenticate(self):
+        """Authenticate using credentials in config file, or fall back to prompting the user for the credentials."""
         try:
             pyrax.set_credential_file(self.configFile)
             print bcolors.OKBLUE + "Authentication SUCCEEDED!" + bcolors.ENDC
@@ -42,6 +44,7 @@ class raxLogin(object):
             self.raxLoginPrompt()
 
     def raxLoginPrompt(self):
+        """Prompt the user for a login name and API Key to use for logging into the API."""
         self.raxUser = raw_input('Username: ')
         self.raxAPIKey = getpass.getpass('API Key: ')
         try:

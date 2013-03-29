@@ -133,6 +133,6 @@ if raxArgs.create_server:
     if raxArgs.ord:
         raxCreateServer('ORD')
     if raxArgs.lon:
-        raxCreateServer('lon')
+        raxCreateServer('LON')
 
 
