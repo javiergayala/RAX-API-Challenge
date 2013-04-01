@@ -5,6 +5,7 @@ Script submissions for the Rackspace Support Cloud API Challenge using pyrax
 
 
 ## Challenge 1 _(challenge1.py)_ ##
+#### Cloud Servers ####
 
 __Goal:__ Write a script that builds three 512MB Cloud Servers that follow a similar naming convention. (i.e. web1, web2, web3) and returns the IP and login credentials for each server.  Use any image.  
 
@@ -30,6 +31,7 @@ __Goal:__ Write a script that builds three 512MB Cloud Servers that follow a sim
 	  -V, --version         show program's version number and exit
 	  
 ## Challenge 2 _(challenge2.py)_ ##
+#### Cloud Servers ####
 
 __Goal:__ Write a script that clones a server (takes an image and deploys the image as a new server).
 
@@ -55,6 +57,7 @@ __Goal:__ Write a script that clones a server (takes an image and deploys the im
 	  -V, --version         show program's version number and exit
 	  
 ## Challenge 4 _(challenge4.py)_ ##
+#### Cloud DNS ####
 
 __Goal:__ Write a script that uses Cloud DNS to create a new A record when passed a FQDN and IP address as arguments.  
 
@@ -74,6 +77,35 @@ __Goal:__ Write a script that uses Cloud DNS to create a new A record when passe
 	  -dn DOMAIN_NAME, --domain-name DOMAIN_NAME
 	                        Domain
 	  -d                    Debug
+	  -V, --version         show program's version number and exit
+	  
+## Challenge 5 _(challenge5.py)_ ##
+#### Cloud Databases ####
+
+__Goal:__ Write a script that creates a Cloud Database instance. This instance should contain at least one database, and the database should have at least one user that can connect to it.
+
+	usage: challenge5.py [-h] [-c CONFIGFILE] [-cd] [-di INSTANCENAME]
+                     [-dn DBNAME] [-du DBUSER] [-dp DBPASS] [-dfw] [-ord] [-d]
+                     [-V]
+
+	Challenge 5 of the API Challenge
+	
+	optional arguments:
+	  -h, --help            show this help message and exit
+	  -c CONFIGFILE, --config CONFIGFILE
+	                        Location of the config file
+	  -cd, --create-db      Create a Cloud Database
+	  -di INSTANCENAME, --db-instance INSTANCENAME
+	                        Name of the Database Instance
+	  -dn DBNAME, --db-name DBNAME
+	                        Name of the Database
+	  -du DBUSER, --db-user DBUSER
+	                        Name of the Database User
+	  -dp DBPASS, --db-pass DBPASS
+	                        Password for the Database User
+	  -dfw                  Perform action in DFW
+	  -ord                  Perform action in ORD
+	  -d                    Show debug info, such as HTTP responses
 	  -V, --version         show program's version number and exit
 	  
 ## Requirements ##
