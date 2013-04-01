@@ -1,35 +1,58 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+# Copyright 2013 Javier Ayala
+# All Rights Reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License"); you may
+#    not use this file except in compliance with the License. You may obtain
+#    a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#    License for the specific language governing permissions and limitations
+#    under the License.
 import os
 import sys
 import time
-import re
 import argparse
-import getpass
-import socket
 import pprint
 import pyrax
-import pyrax.exceptions as exc
 from helpers import bcolors, raxLogin
 
 # Pre-defined Variables
 defConfigFile = os.path.expanduser('~') + '/.pyrax.cfg'
 
 # Argument Parsing
-raxParse = argparse.ArgumentParser(description='Challenge 1 of the API Challenge')
-raxParse.add_argument('-c', '--config', dest='configFile', help="Location of the config file", default=defConfigFile)
-raxParse.add_argument('-ls', '--list-servers', action='store_true', help="List Cloud Servers")
-raxParse.add_argument('-cs', '--create-server', action='store_true', help="Create Server")
-raxParse.add_argument('-ns', '--number-of-servers', dest='numServers', help="Number of servers")
-raxParse.add_argument('-sn', '--server-name', dest='svrBaseName', help="Base name of servers")
-raxParse.add_argument('-dfw', action='store_true', help='Perform action in DFW')
-raxParse.add_argument('-ord', action='store_true', help='Perform action in ORD')
-raxParse.add_argument('-lon', action='store_true', help='Perform action in LON')
-raxParse.add_argument('-d', dest='debug', action='store_true', help="Show debug info, such as HTTP responses")
-raxParse.add_argument('-V', '--version', action='version', version='%(prog)s 0.1 by Javier Ayala')
+raxParse = argparse.ArgumentParser(description='Challenge 1 of the \
+    API Challenge')
+raxParse.add_argument('-c', '--config', dest='configFile',
+                      help="Location of the config file",
+                      default=defConfigFile)
+raxParse.add_argument('-ls', '--list-servers', action='store_true',
+                      help="List Cloud Servers")
+raxParse.add_argument('-cs', '--create-server', action='store_true',
+                      help="Create Server")
+raxParse.add_argument('-ns', '--number-of-servers', dest='numServers',
+                      help="Number of servers")
+raxParse.add_argument('-sn', '--server-name', dest='svrBaseName',
+                      help="Base name of servers")
+raxParse.add_argument('-dfw', action='store_true',
+                      help='Perform action in DFW')
+raxParse.add_argument('-ord', action='store_true',
+                      help='Perform action in ORD')
+raxParse.add_argument('-lon', action='store_true',
+                      help='Perform action in LON')
+raxParse.add_argument('-d', dest='debug', action='store_true',
+                      help="Show debug info, such as HTTP responses")
+raxParse.add_argument('-V', '--version', action='version',
+                      version='%(prog)s 0.1 by Javier Ayala')
 raxArgs = raxParse.parse_args()
 
 # See if there is a pyrax.cfg file
 configFileTest = os.path.isfile(raxArgs.configFile)
+
 
 def raxListServers():
     if (raxArgs.dfw or raxArgs.ord or raxArgs.lon):
@@ -54,15 +77,15 @@ def raxListServers():
     if raxArgs.lon:
         cs_lon = pyrax.connect_to_cloudservers(region="LON")
         lon_servers = cs_lon.servers.list()
-        print "LON: " 
+        print "LON: "
         ls_pp.pprint(lon_servers)
+
 
 def raxCreateServer(dc):
     raxCldSvr = pyrax.connect_to_cloudservers(region=dc)
     serverImgs = raxCldSvr.images.list()
-    numSvrsCreated = 0 # Counter for the number of servers that get created by the script
-    svrsCreated = {} # Dictionary to hold info on the servers that get created
-    completed = [] # Array to hold the servers that complete creation
+    svrsCreated = {}  # Dictionary to hold info on the servers that get created
+    completed = []  # Array to hold the servers that complete creation
     for img in sorted(serverImgs, key=lambda serverImgs: serverImgs.name):
         print img.name, " || ID:", img.id
     imgIDToUse = raw_input('ID of image to use: ')
@@ -72,23 +95,27 @@ def raxCreateServer(dc):
     for flvr in serverFlvrs:
         print "Name: " + flvr.name + " || ID:" + flvr.id
     flvrIDToUse = raw_input('ID of flavor to use: ')
-    flvrNameToUse = [flvr.name for flvr in serverFlvrs if flvr.id == flvrIDToUse][0]
+    flvrNameToUse = [flvr.name for flvr in serverFlvrs
+                     if flvr.id == flvrIDToUse][0]
     print 'Using ' + bcolors.OKBLUE + imgNameToUse + bcolors.ENDC
     try:
         numServers = int(raxArgs.numServers)
-    except (ValueError, TypeError) as e:
+    except (ValueError, TypeError):
         numServers = int(raw_input('Number of servers to create: '))
-    if (raxArgs.svrBaseName == None):
+    if (raxArgs.svrBaseName is None):
         svrBaseName = raw_input('What is the server base name to use: ')
     else:
         svrBaseName = raxArgs.svrBaseName
-    print 'Creating a new ' + bcolors.OKBLUE + flvrNameToUse + bcolors.ENDC + ' with ' + bcolors.OKBLUE + imgNameToUse + bcolors.ENDC + ' in ' + bcolors.WARNING + dc + bcolors.ENDC + '.'
+    print 'Creating a new ' + bcolors.OKBLUE + flvrNameToUse + bcolors.ENDC + \
+        ' with ' + bcolors.OKBLUE + imgNameToUse + bcolors.ENDC + ' in ' + \
+        bcolors.WARNING + dc + bcolors.ENDC + '.'
     print 'Creating ' + str(numServers) + ' servers.'
     print 'Server name will begin with ' + svrBaseName
 
     for i in xrange(0, numServers):
         svrName = '%s%s' % (svrBaseName, i)
-        svrsCreated[svrName] = raxCldSvr.servers.create(svrName, imgIDToUse, flvrIDToUse)
+        svrsCreated[svrName] = raxCldSvr.servers.create(svrName, imgIDToUse,
+                                                        flvrIDToUse)
         print "Created server: %s" % svrName
     sys.stdout.write("Waiting for builds to complete")
     sys.stdout.flush()
@@ -105,7 +132,8 @@ def raxCreateServer(dc):
                 print '======================================='
                 print 'Name: %s' % server.name
                 if (server.status == 'ERROR'):
-                    print 'Status: %s %s %s' % bcolors.FAIL, server.status, bcolors.ENDC
+                    print 'Status: %s %s %s' % bcolors.FAIL, server.status, \
+                        bcolors.ENDC
                 else:
                     print 'Status: %s' % server.status
                 print 'ID: %s' % server.id
@@ -134,5 +162,4 @@ if raxArgs.create_server:
         raxCreateServer('ORD')
     if raxArgs.lon:
         raxCreateServer('LON')
-
 
