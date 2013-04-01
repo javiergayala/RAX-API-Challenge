@@ -2,9 +2,10 @@
 # Helper Functions for RAX API Challenges
 
 import getpass
-import os
+import sys
 import pyrax
 import pyrax.exceptions as exc
+
 
 class bcolors():
     """Provides color definitions for text output"""
@@ -29,28 +30,31 @@ class raxLogin(object):
     def __init__(self, configFile):
         super(raxLogin, self).__init__()
         self.configFile = configFile
-    #print "Config file: %s" % self.configFile
-    
+
     def authenticate(self):
-        """Authenticate using credentials in config file, or fall back to prompting the user for the credentials."""
+        """Authenticate using credentials in config file, or fall back to
+            prompting the user for the credentials."""
         try:
             pyrax.set_credential_file(self.configFile)
             print bcolors.OKBLUE + "Authentication SUCCEEDED!" + bcolors.ENDC
         except exc.AuthenticationFailed:
-            print bcolors.FAIL + "Authentication Failed using the credentials in " + str(self.configFile) + bcolors.ENDC
+            print bcolors.FAIL + "Authentication Failed using the credentials \
+                in " + str(self.configFile) + bcolors.ENDC
             self.raxLoginPrompt()
         except exc.FileNotFound:
-            print bcolors.WARNING + "No config file found: " + str(self.configFile) + bcolors.ENDC
+            print bcolors.WARNING + "No config file found: " + str(
+                self.configFile) + bcolors.ENDC
             self.raxLoginPrompt()
 
     def raxLoginPrompt(self):
-        """Prompt the user for a login name and API Key to use for logging into the API."""
+        """Prompt the user for a login name and API Key to use for logging
+            into the API."""
         self.raxUser = raw_input('Username: ')
         self.raxAPIKey = getpass.getpass('API Key: ')
         try:
             pyrax.set_credentials(self.raxUser, self.raxAPIKey)
             print bcolors.OKBLUE + "Authentication SUCCEEDED!" + bcolors.ENDC
         except exc.AuthenticationFailed:
-            print bcolors.FAIL + "Authentication Failed using the Username and API Key provided!" + bcolors.ENDC
+            print bcolors.FAIL + "Authentication Failed using the Username \
+                and API Key provided!" + bcolors.ENDC
             sys.exit(1)
-        
