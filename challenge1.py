@@ -23,6 +23,7 @@ from helpers import bcolors, raxLogin
 
 # Pre-defined Variables
 defConfigFile = os.path.expanduser('~') + '/.pyrax.cfg'
+progName = 'RAX Challenge-inator 1000'
 
 # Argument Parsing
 raxParse = argparse.ArgumentParser(description='Challenge 1 of the \
@@ -140,16 +141,30 @@ def raxCreateServer(dc):
                 print 'Networks: %s' % server.networks
                 print 'Password: %s' % server.adminPass
                 completed.append(name)
+
+"""This is where the magic happens!"""
+
+print "\n%(header)sWelcome to the %(progname)s! %(endc)s" % {
+    "header": bcolors.HEADER, "progname": progName, "endc": bcolors.ENDC
+}
 if (len(sys.argv) == 1):
+    print ("%(warning)sThe %(progname)s is happiest when you correctly "
+           "tell it what to do...%(endc)s\n") % {"warning": bcolors.WARNING,
+                                                 "progname": progName,
+                                                 "endc": bcolors.ENDC}
     raxParse.print_usage()
     sys.exit()
 
+print ("%(blue)sWhipping out our janitor's keyring to see if we have "
+       "the right key to open the door...%(endc)s") % {"blue": bcolors.OKBLUE,
+                                                       "endc": bcolors.ENDC}
 try:
     myLogin = raxLogin(raxArgs.configFile)
     myLogin.authenticate()
 except:
     print bcolors.FAIL + "Couldn't login" + bcolors.ENDC
     sys.exit()
+
 
 if raxArgs.debug:
     pyrax.set_http_debug(True)
@@ -162,4 +177,3 @@ if raxArgs.create_server:
         raxCreateServer('ORD')
     if raxArgs.lon:
         raxCreateServer('LON')
-

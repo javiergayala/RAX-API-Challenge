@@ -38,10 +38,14 @@ class raxLogin(object):
             pyrax.set_credential_file(self.configFile)
             print bcolors.OKBLUE + "Authentication SUCCEEDED!" + bcolors.ENDC
         except exc.AuthenticationFailed:
-            print bcolors.FAIL + "Authentication Failed using the credentials \
-                in " + str(self.configFile) + bcolors.ENDC
+            print ("%(blue)sCan't seem to find the right key on my keyring... "
+                   "%(endc)s") % {"blue": bcolors.OKBLUE, "endc": bcolors.ENDC}
+            print bcolors.FAIL + "Authentication Failed using the " + \
+                "credentials in " + str(self.configFile) + bcolors.ENDC
             self.raxLoginPrompt()
         except exc.FileNotFound:
+            print ("%(blue)sI seem to have misplaced my keyring... Awkward..."
+                   "%(endc)s") % {"blue": bcolors.OKBLUE, "endc": bcolors.ENDC}
             print bcolors.WARNING + "No config file found: " + str(
                 self.configFile) + bcolors.ENDC
             self.raxLoginPrompt()
@@ -49,12 +53,14 @@ class raxLogin(object):
     def raxLoginPrompt(self):
         """Prompt the user for a login name and API Key to use for logging
             into the API."""
+        print ("%(blue)sI really hate to ask...but...can I borrow your key?"
+               "%(endc)s") % {"blue": bcolors.OKBLUE, "endc": bcolors.ENDC}
         self.raxUser = raw_input('Username: ')
         self.raxAPIKey = getpass.getpass('API Key: ')
         try:
             pyrax.set_credentials(self.raxUser, self.raxAPIKey)
             print bcolors.OKBLUE + "Authentication SUCCEEDED!" + bcolors.ENDC
         except exc.AuthenticationFailed:
-            print bcolors.FAIL + "Authentication Failed using the Username \
-                and API Key provided!" + bcolors.ENDC
+            print bcolors.FAIL + "Authentication Failed using the " + \
+                "Username and API Key provided!" + bcolors.ENDC
             sys.exit(1)

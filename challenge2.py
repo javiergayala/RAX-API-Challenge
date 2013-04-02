@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # Copyright 2013 Javier Ayala
 # All Rights Reserved.
 #
@@ -22,6 +22,7 @@ from helpers import bcolors, raxLogin
 
 # Pre-defined Variables
 defConfigFile = os.path.expanduser('~') + '/.pyrax.cfg'
+progName = 'RAX Challenge-inator 2000'
 
 # Argument Parsing
 raxParse = argparse.ArgumentParser(
@@ -146,7 +147,18 @@ def raxCreateServer(dc, imgIDToUse):
                 print 'Networks: %s' % server.networks
                 print 'Password: %s' % server.adminPass
                 completed.append(name)
+
+
+"""This is where the magic happens!"""
+
+print "\n%(header)sWelcome to the %(progname)s! %(endc)s" % {
+    "header": bcolors.HEADER, "progname": progName, "endc": bcolors.ENDC
+}
 if (len(sys.argv) == 1):
+    print ("%(warning)sThe %(progname)s is happiest when you correctly "
+           "tell it what to do...%(endc)s\n") % {"warning": bcolors.WARNING,
+                                                 "progname": progName,
+                                                 "endc": bcolors.ENDC}
     raxParse.print_usage()
     sys.exit()
 
@@ -162,6 +174,9 @@ else:
         "fail": bcolors.FAIL, "endc": bcolors.ENDC}
     sys.exit(1)
 
+print ("%(blue)sWhipping out our janitor's keyring to see if we have "
+       "the right key to open the door...%(endc)s") % {"blue": bcolors.OKBLUE,
+                                                       "endc": bcolors.ENDC}
 try:
     myLogin = raxLogin(raxArgs.configFile)
     myLogin.authenticate()
