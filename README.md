@@ -56,6 +56,30 @@ __Goal:__ Write a script that clones a server (takes an image and deploys the im
 	  -d                    Show debug info, such as HTTP responses
 	  -V, --version         show program's version number and exit
 	  
+## Challenge 3 _(challenge3.py)_ ##
+#### Cloud Files ####
+
+__Goal:__ Write a script that accepts a directory as an argument as well as a container name. The script should upload the contents of the specified directory to the container (or create it if it doesn't exist). The script should handle errors appropriately. (Check for invalid paths, etc.)
+
+	usage: challenge3.py [-h] [-c CONFIGFILE] -d ORIGINDIR -cn CONTNAME [-dfw]
+                     [-ord] [-v] [-V]
+
+	Challenge 3 of the API Challenge
+
+	optional arguments:
+	  -h, --help            show this help message and exit
+	  -c CONFIGFILE, --config CONFIGFILE
+	                        Location of the config file
+	  -d ORIGINDIR, --dir ORIGINDIR
+	                        Directory containing source files to upload to CF
+	                        Container
+	  -cn CONTNAME, --container CONTNAME
+	                        Name of the new CF Container to hold the uploaded
+	                        files
+	  -dfw                  Perform action in DFW
+	  -ord                  Perform action in ORD
+	  -v                    Show debug info, such as HTTP responses
+	  -V, --version         show program's version number and exit
 ## Challenge 4 _(challenge4.py)_ ##
 #### Cloud DNS ####
 
