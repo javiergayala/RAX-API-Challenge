@@ -132,6 +132,26 @@ __Goal:__ Write a script that creates a Cloud Database instance. This instance s
 	  -d                    Show debug info, such as HTTP responses
 	  -V, --version         show program's version number and exit
 	  
+## Challenge 6 _(challenge6.py)_ ##
+#### Cloud Files (CDN) ####
+
+__Goal:__ Write a script that creates a CDN-enabled container in Cloud Files.
+
+	usage: challenge6.py [-h] [-c CONFIGFILE] -cn CONTNAME [-dfw] [-ord] [-v] [-V]
+
+	Challenge 6 of the API Challenge
+
+	optional arguments:
+	  -h, --help            show this help message and exit
+	  -c CONFIGFILE, --config CONFIGFILE
+	                        Location of the config file
+	  -cn CONTNAME, --container CONTNAME
+	                        Name of the new CF Container to hold the uploaded
+	                        files
+	  -dfw                  Perform action in DFW
+	  -ord                  Perform action in ORD
+	  -v                    Show debug info, such as HTTP responses
+	  -V, --version         show program's version number and exit
 ## Requirements ##
 
 - Rackspace Cloud Account
