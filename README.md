@@ -152,6 +152,35 @@ __Goal:__ Write a script that creates a CDN-enabled container in Cloud Files.
 	  -ord                  Perform action in ORD
 	  -v                    Show debug info, such as HTTP responses
 	  -V, --version         show program's version number and exit
+## Challenge 7 _(challenge7.py)_ ##
+#### Cloud Loadbalancers ####
+
+__Goal:__ Write a script that will create 2 Cloud Servers and add them as nodes to a new Cloud Load Balancer.
+
+	usage: challenge7.py [-h] [-c CONFIGFILE] [-sn SVRBASENAME] [-si IMGIDTOUSE]
+                     [-sf FLVRIDTOUSE] [-ln LBNAME] [-n NUMSERVERS] [-dfw]
+                     [-ord] [-v] [-V]
+
+	Challenge 7 of the API Challenge
+
+	optional arguments:
+	  -h, --help            show this help message and exit
+	  -c CONFIGFILE, --config CONFIGFILE
+	                        Location of the config file
+	  -sn SVRBASENAME, --server-name SVRBASENAME
+	                        Base name of the newly created servers
+	  -si IMGIDTOUSE, --server-image IMGIDTOUSE
+	                        ID of the server image to use
+	  -sf FLVRIDTOUSE, --server-flavor FLVRIDTOUSE
+	                        ID of the server flavor to use
+	  -ln LBNAME, --lb-name LBNAME
+	                        Name of the load-balacer to create
+	  -n NUMSERVERS, --num-servers NUMSERVERS
+	                        Number of servers to create
+	  -dfw                  Perform action in DFW
+	  -ord                  Perform action in ORD
+	  -v                    Show debug info, such as HTTP responses
+	  -V, --version         show program's version number and exit
 ## Requirements ##
 
 - Rackspace Cloud Account

@@ -18,6 +18,7 @@ import sys
 import argparse
 import time
 import pyrax
+import pyrax.exceptions as exc
 from helpers import bcolors, raxLogin
 
 # Pre-defined Variables
@@ -26,14 +27,20 @@ progName = 'RAX Challenge-inator 7000'
 
 
 def raxListImages(raxCldSvr):
-    serverImgs = raxCldSvr.images.list()
-    for img in sorted(serverImgs, key=lambda serverImgs: serverImgs.name):
-        print img.name, " || ID:", img.id
-    imgIDToUse = raw_input('ID of image to use: ')
-    serverFlvrs = raxCldSvr.flavors.list()
-    for flvr in serverFlvrs:
-        print "Name: " + flvr.name + " || ID:" + flvr.id
-    flvrIDToUse = raw_input('ID of flavor to use: ')
+    if (raxArgs.imgIDToUse is None):
+        serverImgs = raxCldSvr.images.list()
+        for img in sorted(serverImgs, key=lambda serverImgs: serverImgs.name):
+            print img.name, " || ID:", img.id
+        imgIDToUse = raw_input('ID of image to use: ')
+    else:
+        imgIDToUse = raxArgs.imgIDToUse
+    if (raxArgs.flvrIDToUse is None):
+        serverFlvrs = raxCldSvr.flavors.list()
+        for flvr in serverFlvrs:
+            print "Name: " + flvr.name + " || ID:" + flvr.id
+        flvrIDToUse = raw_input('ID of flavor to use: ')
+    else:
+        flvrIDToUse = raxArgs.flvrIDToUse
     return imgIDToUse, flvrIDToUse
 
 
@@ -64,16 +71,17 @@ def raxCreateServer(raxCldSvr, numServers, svrBaseName, imgIDToUse,
                 print '======================================='
                 print 'Name: %s' % server.name
                 if (server.status == 'ERROR'):
-                    print 'Status: %s %s %s' % bcolors.FAIL, server.status, \
-                        bcolors.ENDC
+                    print('Status: %(fail)s %(stat)s'
+                          ' %(endc)s') % {"fail": bcolors.FAIL,
+                                          "stat": server.status,
+                                          "endc": bcolors.ENDC}
                 else:
                     print 'Status: %s' % server.status
-                print 'ID: %s' % server.id
-                print 'Networks: %s' % server.networks
-                nodeInfo[name] = {}
-                nodeInfo[name]['privateIp'] = \
-                    str(server.networks['private'][0])
-                print 'Password: %s' % server.adminPass
+                    print 'ID: %s' % server.id
+                    print 'Networks: %s' % server.networks
+                    nodeInfo[name] = \
+                        str(server.networks['private'][0])
+                    print 'Password: %s' % server.adminPass
                 completed.append(name)
     return nodeInfo
 
@@ -84,6 +92,10 @@ raxParse.add_argument('-c', '--config', dest='configFile', help="Location of \
     the config file", default=defConfigFile)
 raxParse.add_argument('-sn', '--server-name', dest='svrBaseName', help="Base \
     name of the newly created servers")
+raxParse.add_argument('-si', '--server-image', dest='imgIDToUse', help="ID \
+    of the server image to use")
+raxParse.add_argument('-sf', '--server-flavor', dest='flvrIDToUse', help="ID \
+    of the server flavor to use")
 raxParse.add_argument('-ln', '--lb-name', dest='lbName', help="Name \
     of the load-balacer to create")
 raxParse.add_argument('-n', '--num-servers', dest='numServers', help="Number \
@@ -139,20 +151,48 @@ imgIDToUse, flvrIDToUse = raxListImages(raxCldSvr)
 lbNodes = raxCreateServer(raxCldSvr, numServers, svrBaseName, imgIDToUse,
                           flvrIDToUse)
 
-nodes = {}
+nodes = []
 print "\n%(header)sCreating LB Nodes! %(endc)s" % {
     "header": bcolors.HEADER, "endc": bcolors.ENDC}
-for name in lbNodes:
-    nodes[name] = raxCldLB.Node(address=name['privateIp'], port=80,
-                                condition='ENABLED')
-    print "%(name)s node created..." % name
+for name, privateIp in lbNodes.iteritems():
+    nodes.append(raxCldLB.Node(address=privateIp, port=80,
+                               condition='ENABLED'))
+    print "%s node created..." % name
 print "\n%(header)sCreating LB VIP! %(endc)s" % {
     "header": bcolors.HEADER, "endc": bcolors.ENDC}
 vip = raxCldLB.VirtualIP(type='PUBLIC')
+
 print "\n%(header)sPiecing it all together! %(endc)s" % {
     "header": bcolors.HEADER, "endc": bcolors.ENDC}
 newLb = raxCldLB.create(lbName, port=80, protocol="HTTP", nodes=nodes,
                         virtual_ips=[vip])
+print "New Cloud LB ID: %s" % newLb.id
+print "\n%(header)sCloud LB Built! Waiting for 'ACTIVE'... %(endc)s" % {
+    "header": bcolors.HEADER, "endc": bcolors.ENDC}
 
-print str(newLb)
-print str(lbNodes)
+try:
+    pyrax.utils.wait_until(newLb, "status", ['ACTIVE', 'ERROR'], interval=5,
+                           attempts=24, verbose=True)
+except exc.BadResponse:
+    pyrax.utils.wait_until(newLb, "status", ['ACTIVE', 'ERROR'], interval=5,
+                           attempts=24, verbose=True)
+
+if (str(newLb.status) == 'ACTIVE'):
+    print("%(head)sCloud Load-balancer is now active!"
+          "%(endc)s") % {"head": bcolors.HEADER, "endc": bcolors.ENDC}
+    print bcolors.OKBLUE
+    print "LB Name: %s" % str(newLb.name)
+    print "LB Port: %s" % str(newLb.port)
+    print "Protocol: %s" % str(newLb.protocol)
+    print "Algorithm: %s" % str(newLb.algorithm)
+    print "LB IP: %(a)s" % {"a": newLb.virtual_ips[0]}
+    print bcolors.ENDC
+elif (str(newLb.status) == 'ERROR') or (str(newLb.status) == 'BUILD'):
+    print bcolors.FAIL
+    print("You got a problem, Jack! Your new LB has a status"
+          " of '%s'!") % str(newLb.status)
+    print "LB Name: %s" % str(newLb.name)
+    print bcolors.WARN
+    print "Debug Info:"
+    print str(newLb)
+    print bcolors.ENDC
