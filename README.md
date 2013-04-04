@@ -181,9 +181,34 @@ __Goal:__ Write a script that will create 2 Cloud Servers and add them as nodes 
 	  -ord                  Perform action in ORD
 	  -v                    Show debug info, such as HTTP responses
 	  -V, --version         show program's version number and exit
+## Challenge 8 _(challenge8.py)_ ##
+#### Cloud Files (CDN) & Cloud DNS ####
+
+__Goal:__ Write a script that will create a static webpage served out of Cloud Files. The script must create a new container, cdn enable it, enable it to serve an index file, create an index file object, upload the object to the container, and create a CNAME record pointing to the CDN URL of the container.
+
+	usage: challenge8.py [-h] [-c CONFIGFILE] -co CONTNAME [-dns DNSDOMAIN]
+                     [-cn CNAME] [-dfw] [-ord] [-v] [-V]
+
+	Challenge 8 of the API Challenge
+
+	optional arguments:
+	  -h, --help            show this help message and exit
+	  -c CONFIGFILE, --config CONFIGFILE
+	                        Location of the config file
+	  -co CONTNAME, --container CONTNAME
+	                        Name of the new CF Container to hold the uploaded
+	                        files
+	  -dns DNSDOMAIN        DNS Domain to use
+	  -cn CNAME             CNAME to use
+	  -dfw                  Perform action in DFW
+	  -ord                  Perform action in ORD
+	  -v                    Show debug info, such as HTTP responses
+	  -V, --version         show program's version number and exit
 ## Requirements ##
 
 - Rackspace Cloud Account
+- Python 2.7 or higher
+- pyrax Python Module
 
 ## Status ##
 
