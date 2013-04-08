@@ -120,30 +120,33 @@ __Goal:__ Write a script that uses Cloud DNS to create a new A record when passe
 
 __Goal:__ Write a script that creates a Cloud Database instance. This instance should contain at least one database, and the database should have at least one user that can connect to it.
 
-	usage: challenge5.py [-h] [-c CONFIGFILE] [-cd] [-di INSTANCENAME]
-                     [-dn DBNAME] [-du DBUSER] [-dp DBPASS] [-dfw] [-ord] [-d]
-                     [-V]
+	usage: challenge5.py [-h] [-c CONFIGFILE] [-p DBPASS] [-f {1,2,3,4,5,6}]
+                     [-s {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50}]
+                     [-dc {DFW,ORD,LON}] [-d] [-V]
+                     instanceName dbName dbUser
 
-	Challenge 5 of the API Challenge
-	
+	Challenge 5 of the API Challenge: Write a script that creates a Cloud Database
+	instance. This instance should contain at least one database, and the database
+	should have at least one user that can connect to it.
+
+	positional arguments:
+	  instanceName          Name of the Database Instance
+	  dbName                Name of the Database
+	  dbUser                Name of the Database User
+
 	optional arguments:
 	  -h, --help            show this help message and exit
 	  -c CONFIGFILE, --config CONFIGFILE
 	                        Location of the config file
-	  -cd, --create-db      Create a Cloud Database
-	  -di INSTANCENAME, --db-instance INSTANCENAME
-	                        Name of the Database Instance
-	  -dn DBNAME, --db-name DBNAME
-	                        Name of the Database
-	  -du DBUSER, --db-user DBUSER
-	                        Name of the Database User
-	  -dp DBPASS, --db-pass DBPASS
+	  -p DBPASS, --db-pass DBPASS
 	                        Password for the Database User
-	  -dfw                  Perform action in DFW
-	  -ord                  Perform action in ORD
+	  -f {1,2,3,4,5,6}, --flavor {1,2,3,4,5,6}
+	                        Flavor to use for the Database Instance
+	  -s {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50}
+	                        Size of the Database Instance in GB (1-50)
+	  -dc {DFW,ORD,LON}
 	  -d                    Show debug info, such as HTTP responses
 	  -V, --version         show program's version number and exit
-	  
 ## Challenge 6 _(challenge6.py)_ ##
 #### Cloud Files (CDN) ####
 

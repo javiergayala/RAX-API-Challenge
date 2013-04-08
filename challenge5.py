@@ -33,16 +33,15 @@ raxParse = argparse.ArgumentParser(description='Challenge 5 of the API \
     have at least one user that can connect to it.')
 raxParse.add_argument('-c', '--config', dest='configFile', help="Location of \
     the config file", default=defConfigFile)
-raxParse.add_argument('-cd', '--create-db', action='store_true', help="Create \
-    a Cloud Database")
-raxParse.add_argument('-di', '--db-instance', dest='instanceName', help="Name \
-    of the Database Instance")
-raxParse.add_argument('-dn', '--db-name', dest='dbName', help="Name of the \
-    Database")
-raxParse.add_argument('-du', '--db-user', dest='dbUser', help="Name of the \
-    Database User")
-raxParse.add_argument('-dp', '--db-pass', dest='dbPass', help="Password for \
+raxParse.add_argument('instanceName', help="Name of the Database Instance")
+raxParse.add_argument('dbName', help="Name of the Database")
+raxParse.add_argument('dbUser', help="Name of the  Database User")
+raxParse.add_argument('-p', '--db-pass', dest='dbPass', help="Password for \
     the Database User")
+raxParse.add_argument('-f', '--flavor', dest='flavor', help='Flavor to \
+    use for the Database Instance', type=int, choices=xrange(1, 7))
+raxParse.add_argument('-s', dest='instSize', help='Size of the \
+    Database Instance in GB (1-50)', type=int, choices=xrange(1, 51))
 raxParse.add_argument('-dc', choices=['DFW', 'ORD', 'LON'])
 raxParse.add_argument('-d', dest='debug', action='store_true', help="Show \
     debug info, such as HTTP responses")
@@ -116,30 +115,37 @@ class raxLogin(object):
 def raxCreateInstance():
     """Create a new Cloud Database Instance"""
     flavors = cdb.list_flavors()
-    print "%(header)s Available Cloud DB Flavors: %(endc)s" % {
-        "header": bcolors.HEADER, "endc": bcolors.ENDC}
-    for pos, flavor in enumerate(flavors):
-        print "%s: %s [%s]" % (pos, flavor.name, flavor.ram)
-    flavor2use = int(raw_input(
-        "Select a Flavor for the new Cloud DB Instance: "))
+    if (raxArgs.flavor is None):
+        print "\n%(header)sAvailable Cloud DB Flavors: %(endc)s" % {
+            "header": bcolors.HEADER, "endc": bcolors.ENDC}
+        for pos, flavor in enumerate(flavors):
+            print "%s: %s [%s]" % (flavor.id, flavor.name, flavor.ram)
+        flavor2use = int(raw_input(
+            "Select a Flavor for the new Cloud DB Instance: "))
+    else:
+        flavor2use = raxArgs.flavor
+    try:
+        selectedFlvr = [flvr.id for flvr in flavors if
+                        flvr.id == flavor2use][0]
+    except:
+        print "%(fail)sInvalid Flavor Selection!%(endc)s" % {
+            "fail": bcolors.FAIL, "endc": bcolors.ENDC}
+        sys.exit(1)
     if (raxArgs.instanceName is None):
         instanceName = raw_input("Enter a name for your  Cloud DB Instance: ")
     else:
         instanceName = raxArgs.instanceName
-    try:
-        selected = flavors[flavor2use]
-    except IndexError:
-        print "%(fail)sInvalid Flavor Selection!%(endc)s" % {
-            "fail": bcolors.FAIL, "endc": bcolors.ENDC}
-        sys.exit(1)
-
-    instanceSize = int(raw_input("Enter the Instance Size in GB(1-50): "))
-    if ((instanceSize < 1) or (instanceSize > 50)):
-        print "%(fail)sInstance Size MUST be between 1-50!%(endc)s" % {
-            "fail": bcolors.FAIL, "endc": bcolors.ENDC}
-        sys.exit(1)
-
-    newInstance = cdb.create(instanceName, flavor=selected,
+    if (raxArgs.instSize is None):
+        instanceSize = int(raw_input("Enter the Instance Size in GB(1-50): "))
+        if ((instanceSize < 1) or (instanceSize > 50)):
+            print "%(fail)sInstance Size MUST be between 1-50!%(endc)s" % {
+                "fail": bcolors.FAIL, "endc": bcolors.ENDC}
+            sys.exit(1)
+    else:
+        instanceSize = raxArgs.instSize
+    print "\n%(header)sCreating Cloud DB Instance... %(endc)s\n" % {
+        "header": bcolors.HEADER, "endc": bcolors.ENDC}
+    newInstance = cdb.create(instanceName, flavor=selectedFlvr,
                              volume=instanceSize)
     dbInstReady = False
     while (dbInstReady is False):
@@ -161,7 +167,9 @@ def raxCreateDb(dbInst):
         dbName = raw_input("Enter the name of the new database: ")
     else:
         dbName = raxArgs.dbName
-
+    print("\n%(header)sCreating Cloud DB '%(db)s' inside Instance "
+          "'%(inst)s'...\n") % {"header": bcolors.HEADER, "db": dbName,
+                                "inst": dbInst.name, "endc": bcolors.ENDC}
     newDbObj = dbInst.create_database(dbName)
     return newDbObj
 
@@ -177,7 +185,9 @@ def raxCreateUser(dbInst, dbName):
         dbPass = getpass.getpass("Enter the password for the new user: ")
     else:
         dbPass = raxArgs.dbPass
-
+    print("\n%(header)sCreating Cloud DB User '%(usr)s' inside Instance "
+          "'%(inst)s'...") % {"header": bcolors.HEADER, "usr": dbUser,
+                              "inst": dbInst.name, "endc": bcolors.ENDC}
     newUserObj = dbInst.create_user(dbUser, dbPass, database_names=dbName)
     return newUserObj
 
@@ -215,35 +225,34 @@ cdb = pyrax.connect_to_cloud_databases(region=dc)
 
 if raxArgs.debug:
     pyrax.set_http_debug(True)
-if raxArgs.create_db:
-    try:
-        newDbInst = raxCreateInstance()
-    except:
-        print "%(fail)sUnable to create a new Cloud DB Instance!%(endc)s" % {
-            "fail": bcolors.FAIL, "endc": bcolors.ENDC}
-        print sys.exc_info()[0]
-        sys.exit(2)
+try:
+    newDbInst = raxCreateInstance()
+except:
+    print "%(fail)sUnable to create a new Cloud DB Instance!%(endc)s" % {
+        "fail": bcolors.FAIL, "endc": bcolors.ENDC}
+    print sys.exc_info()[0]
+    sys.exit(2)
 
-    try:
-        newDbObj = raxCreateDb(newDbInst)
-    except:
-        print "%(fail)sUnable to create a new Cloud Database!%(endc)s" % {
-            "fail": bcolors.FAIL, "endc": bcolors.ENDC}
-        sys.exit(3)
+try:
+    newDbObj = raxCreateDb(newDbInst)
+except:
+    print "%(fail)sUnable to create a new Cloud Database!%(endc)s" % {
+        "fail": bcolors.FAIL, "endc": bcolors.ENDC}
+    sys.exit(3)
 
-    try:
-        newDbUserObj = raxCreateUser(newDbInst, newDbObj.name)
-    except:
-        print "%(fail)sUnable to create a new Cloud DB User!%(endc)s" % {
-            "fail": bcolors.FAIL, "endc": bcolors.ENDC}
-        sys.exit(4)
+try:
+    newDbUserObj = raxCreateUser(newDbInst, newDbObj.name)
+except:
+    print "%(fail)sUnable to create a new Cloud DB User!%(endc)s" % {
+        "fail": bcolors.FAIL, "endc": bcolors.ENDC}
+    sys.exit(4)
 
-    print
-    print "%(hdr)sOperation Complete!%(endc)s" % {
-        "hdr": bcolors.HEADER, "endc": bcolors.ENDC}
-    print "Instance Created: %s" % newDbInst.name
-    print "Instance Hostname: %s" % newDbInst.hostname
-    print "Database Created: %s" % newDbObj.name
-    print "%(ok)sUser '%(dbuser)s' given rights to '%(dbname)s'%(endc)s" % {
-        "ok": bcolors.OKBLUE, "dbuser": newDbUserObj.name,
-        "dbname": newDbObj.name, "endc": bcolors.ENDC}
+print
+print "%(hdr)sOperation Complete!%(endc)s\n" % {
+    "hdr": bcolors.HEADER, "endc": bcolors.ENDC}
+print "Instance Created: %s" % newDbInst.name
+print "Instance Hostname: %s" % newDbInst.hostname
+print "Database Created: %s" % newDbObj.name
+print "%(ok)sUser '%(dbuser)s' given rights to '%(dbname)s'%(endc)s" % {
+    "ok": bcolors.OKBLUE, "dbuser": newDbUserObj.name,
+    "dbname": newDbObj.name, "endc": bcolors.ENDC}
