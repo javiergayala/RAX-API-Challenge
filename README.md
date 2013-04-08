@@ -152,19 +152,21 @@ __Goal:__ Write a script that creates a Cloud Database instance. This instance s
 
 __Goal:__ Write a script that creates a CDN-enabled container in Cloud Files.
 
-	usage: challenge6.py [-h] [-c CONFIGFILE] -cn CONTNAME [-dfw] [-ord] [-v] [-V]
+	usage: challenge6.py [-h] [-c CONFIGFILE] [-dc {DFW,ORD,LON}] [-v] [-V]
+                     contName
 
-	Challenge 6 of the API Challenge
+	Challenge 6 of the API Challenge: Write a script that creates a CDN-enabled
+	container in Cloud Files.
+
+	positional arguments:
+	  contName              Name of the new CF Container to hold the uploaded
+	                        files
 
 	optional arguments:
 	  -h, --help            show this help message and exit
 	  -c CONFIGFILE, --config CONFIGFILE
 	                        Location of the config file
-	  -cn CONTNAME, --container CONTNAME
-	                        Name of the new CF Container to hold the uploaded
-	                        files
-	  -dfw                  Perform action in DFW
-	  -ord                  Perform action in ORD
+	  -dc {DFW,ORD,LON}
 	  -v                    Show debug info, such as HTTP responses
 	  -V, --version         show program's version number and exit
 ## Challenge 7 _(challenge7.py)_ ##

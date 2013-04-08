@@ -24,32 +24,14 @@ import pyrax.exceptions as exc
 defConfigFile = os.path.expanduser('~') + '/.pyrax.cfg'
 progName = 'RAX Challenge-inator 6000'
 
-# Functions
-
-
-def printContAttr(cont, state):
-    """Print out the attributes of the specified container."""
-    print bcolors.HEADER
-    print "%s CDN Status" % state
-    print "=================="
-    print bcolors.OKBLUE
-    print "Container: ", cont.name
-    print "cdn_enabled: ", cont.cdn_ttl
-    print "cdn_log_retention: ", cont.cdn_log_retention
-    print "cdn_uri: ", cont.cdn_uri
-    print "cdn_ssl_uri: ", cont.cdn_ssl_uri
-    print "cdn_streaming_uri: ", cont.cdn_streaming_uri
-    print bcolors.ENDC
-
-
 # Argument Parsing
 raxParse = argparse.ArgumentParser(description='Challenge 6 of the API \
     Challenge: Write a script that creates a CDN-enabled container in Cloud \
     Files.')
 raxParse.add_argument('-c', '--config', dest='configFile', help="Location of \
     the config file", default=defConfigFile)
-raxParse.add_argument('-cn', '--container', dest='contName', help="Name \
-    of the new CF Container to hold the uploaded files", required=True)
+raxParse.add_argument('contName', help="Name of the new CF Container to \
+    hold the uploaded files")
 raxParse.add_argument('-dc', choices=['DFW', 'ORD', 'LON'])
 raxParse.add_argument('-v', dest='verbose', action='store_true', help="Show \
     debug info, such as HTTP responses")
@@ -115,6 +97,21 @@ class raxLogin(object):
             print bcolors.FAIL + "Authentication Failed using the " + \
                 "Username and API Key provided!" + bcolors.ENDC
             sys.exit(1)
+
+
+def printContAttr(cont, state):
+    """Print out the attributes of the specified container."""
+    print bcolors.HEADER
+    print "%s CDN Status" % state
+    print "=================="
+    print bcolors.OKBLUE
+    print "        Container: ", cont.name
+    print "      cdn_enabled: ", cont.cdn_ttl
+    print "cdn_log_retention: ", cont.cdn_log_retention
+    print "          cdn_uri: ", cont.cdn_uri
+    print "      cdn_ssl_uri: ", cont.cdn_ssl_uri
+    print "cdn_streaming_uri: ", cont.cdn_streaming_uri
+    print bcolors.ENDC
 
 if raxArgs.verbose:
     pyrax.set_http_debug(True)
