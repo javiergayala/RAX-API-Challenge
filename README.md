@@ -10,10 +10,14 @@ Script submissions for the Rackspace Support Cloud API Challenge using pyrax
 __Goal:__ Write a script that builds three 512MB Cloud Servers that follow a similar naming convention. (i.e. web1, web2, web3) and returns the IP and login credentials for each server.  Use any image.  
 
 	usage: challenge1.py [-h] [-c CONFIGFILE] [-ls] [-cs] [-ns NUMSERVERS]
-                     [-sn SVRBASENAME] [-dfw] [-ord] [-lon] [-V]
+                     [-sn SVRBASENAME] [-img IMGIDTOUSE] [-flv FLVRIDTOUSE]
+                     [-i] [-dc {DFW,ORD,LON}] [-d] [-V]
 
-	Challenge 1 of the API Challenge
-	
+	Challenge 1 of the API Challenge: Write a script that builds three 512 MB
+	Cloud Servers that following a similar naming convention. (ie., web1, web2,
+	web3) and returns the IP and login credentials for each server. Use any image
+	you want.
+
 	optional arguments:
 	  -h, --help            show this help message and exit
 	  -c CONFIGFILE, --config CONFIGFILE
@@ -24,11 +28,16 @@ __Goal:__ Write a script that builds three 512MB Cloud Servers that follow a sim
 	                        Number of servers
 	  -sn SVRBASENAME, --server-name SVRBASENAME
 	                        Base name of servers
-	  -dfw                  Perform action in DFW
-	  -ord                  Perform action in ORD
-	  -lon                  Perform action in LON
+	  -img IMGIDTOUSE, --image-ID IMGIDTOUSE
+	                        Image ID for building servers
+	  -flv FLVRIDTOUSE, --flavor-ID FLVRIDTOUSE
+	                        Flavor ID for building servers
+	  -i, --interactive     Interactively prompt for info
+	  -dc {DFW,ORD,LON}
 	  -d                    Show debug info, such as HTTP responses
 	  -V, --version         show program's version number and exit
+
+	You MUST select either '-ls' or '-cs'!
 	  
 ## Challenge 2 _(challenge2.py)_ ##
 #### Cloud Servers ####
@@ -36,10 +45,11 @@ __Goal:__ Write a script that builds three 512MB Cloud Servers that follow a sim
 __Goal:__ Write a script that clones a server (takes an image and deploys the image as a new server).
 
 	usage: challenge2.py [-h] [-c CONFIGFILE] [-ci] [-cs] [-ns NUMSERVERS]
-                     [-sn SVRBASENAME] [-dfw] [-ord] [-lon] [-d] [-V]
+                     [-sn SVRBASENAME] [-dc {DFW,ORD,LON}] [-d] [-V]
 
-	Challenge 2 of the API Challenge
-	
+	Challenge 2 of the API Challenge: Write a script that clones a server (takes
+	an image and deploys the image as a new server).
+
 	optional arguments:
 	  -h, --help            show this help message and exit
 	  -c CONFIGFILE, --config CONFIGFILE
@@ -50,34 +60,37 @@ __Goal:__ Write a script that clones a server (takes an image and deploys the im
 	                        Number of servers
 	  -sn SVRBASENAME, --server-name SVRBASENAME
 	                        Base name of servers
-	  -dfw                  Perform action in DFW
-	  -ord                  Perform action in ORD
-	  -lon                  Perform action in LON
+	  -dc {DFW,ORD,LON}
 	  -d                    Show debug info, such as HTTP responses
 	  -V, --version         show program's version number and exit
+
+	You MUST select either '-ci' or '-cs'!
 	  
 ## Challenge 3 _(challenge3.py)_ ##
 #### Cloud Files ####
 
 __Goal:__ Write a script that accepts a directory as an argument as well as a container name. The script should upload the contents of the specified directory to the container (or create it if it doesn't exist). The script should handle errors appropriately. (Check for invalid paths, etc.)
 
-	usage: challenge3.py [-h] [-c CONFIGFILE] -d ORIGINDIR -cn CONTNAME [-dfw]
-                     [-ord] [-v] [-V]
+	usage: challenge3.py [-h] [-c CONFIGFILE] [-dc {DFW,ORD,LON}] [-v] [-V]
+                     originDir containerName
 
-	Challenge 3 of the API Challenge
+	Challenge 3 of the API Challenge: Write a script that accepts a directory as
+	an argument as well as a container name. The script should upload the contents
+	of the specified directory to the container (or create it if it doesn't
+	exist). The script should handle errors appropriately. (Check for invalid
+	paths, etc.)
+
+	positional arguments:
+	  originDir             Directory containing source files to upload to CF
+	                        Container
+	  containerName         Name of the new CF Container to hold the uploaded
+	                        files
 
 	optional arguments:
 	  -h, --help            show this help message and exit
 	  -c CONFIGFILE, --config CONFIGFILE
 	                        Location of the config file
-	  -d ORIGINDIR, --dir ORIGINDIR
-	                        Directory containing source files to upload to CF
-	                        Container
-	  -cn CONTNAME, --container CONTNAME
-	                        Name of the new CF Container to hold the uploaded
-	                        files
-	  -dfw                  Perform action in DFW
-	  -ord                  Perform action in ORD
+	  -dc {DFW,ORD,LON}
 	  -v                    Show debug info, such as HTTP responses
 	  -V, --version         show program's version number and exit
 ## Challenge 4 _(challenge4.py)_ ##
@@ -85,24 +98,23 @@ __Goal:__ Write a script that accepts a directory as an argument as well as a co
 
 __Goal:__ Write a script that uses Cloud DNS to create a new A record when passed a FQDN and IP address as arguments.  
 
-	usage: challenge4.py [-h] [-c CONFIGFILE] [-dls] [-da AFQDN] [-dip AIP] [-V]
+	usage: challenge4.py [-h] [-c CONFIGFILE] [-ld] [-d] [-V] aFQDN aIP domainName
 
-	Challenge 4 of the API Challenge
-	
+	Challenge 4 of the API Challenge: Write a script that uses Cloud DNS to create
+	a new A record when passed a FQDN and IP address as arguments.
+
+	positional arguments:
+	  aFQDN                 FQDN for new A record
+	  aIP                   IP for new A record
+	  domainName            Domain
+
 	optional arguments:
 	  -h, --help            show this help message and exit
 	  -c CONFIGFILE, --config CONFIGFILE
 	                        Location of the config file
 	  -ld, --list-domains   List Domain Names in DNS
-	  -a AFQDN, --a-record AFQDN
-	                        FQDN for new A record
-	  -ip AIP, --add-a-ip AIP
-	                        IP for new A record
-	  -dn DOMAIN_NAME, --domain-name DOMAIN_NAME
-	                        Domain
-	  -d                    Debug
+	  -d                    Show debug info, such as HTTP responses
 	  -V, --version         show program's version number and exit
-	  
 ## Challenge 5 _(challenge5.py)_ ##
 #### Cloud Databases ####
 

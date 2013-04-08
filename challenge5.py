@@ -19,7 +19,7 @@ import argparse
 import getpass
 import time
 import pyrax
-from helpers import bcolors, raxLogin
+import pyrax.exceptions as exc
 
 # Pre-defined Variables
 defConfigFile = os.path.expanduser('~') + '/.pyrax.cfg'
@@ -28,7 +28,9 @@ dbName = None
 
 # Argument Parsing
 raxParse = argparse.ArgumentParser(description='Challenge 5 of the API \
-    Challenge')
+    Challenge: Write a script that creates a Cloud Database instance. This \
+    instance should contain at least one database, and the database should \
+    have at least one user that can connect to it.')
 raxParse.add_argument('-c', '--config', dest='configFile', help="Location of \
     the config file", default=defConfigFile)
 raxParse.add_argument('-cd', '--create-db', action='store_true', help="Create \
@@ -41,10 +43,7 @@ raxParse.add_argument('-du', '--db-user', dest='dbUser', help="Name of the \
     Database User")
 raxParse.add_argument('-dp', '--db-pass', dest='dbPass', help="Password for \
     the Database User")
-raxParse.add_argument('-dfw', action='store_true', help='Perform action in \
-    DFW')
-raxParse.add_argument('-ord', action='store_true', help='Perform action in \
-    ORD')
+raxParse.add_argument('-dc', choices=['DFW', 'ORD', 'LON'])
 raxParse.add_argument('-d', dest='debug', action='store_true', help="Show \
     debug info, such as HTTP responses")
 raxParse.add_argument('-V', '--version', action='version', version='%(prog)s \
@@ -53,6 +52,65 @@ raxArgs = raxParse.parse_args()
 
 # See if there is a pyrax.cfg file
 configFileTest = os.path.isfile(raxArgs.configFile)
+
+
+class bcolors():
+    """Provides color definitions for text output"""
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+
+    def disable(self):
+        self.HEADER = ''
+        self.OKBLUE = ''
+        self.OKGREEN = ''
+        self.WARNING = ''
+        self.FAIL = ''
+        self.ENDC = ''
+
+
+class raxLogin(object):
+    """Provides functionality for logging into the API"""
+    def __init__(self, configFile):
+        super(raxLogin, self).__init__()
+        self.configFile = configFile
+
+    def authenticate(self):
+        """Authenticate using credentials in config file, or fall back to
+            prompting the user for the credentials."""
+        try:
+            pyrax.set_credential_file(self.configFile)
+            print bcolors.OKBLUE + "Authentication SUCCEEDED!" + bcolors.ENDC
+        except exc.AuthenticationFailed:
+            print ("%(blue)sCan't seem to find the right key on my keyring... "
+                   "%(endc)s") % {"blue": bcolors.OKBLUE, "endc": bcolors.ENDC}
+            print bcolors.FAIL + "Authentication Failed using the " + \
+                "credentials in " + str(self.configFile) + bcolors.ENDC
+            self.raxLoginPrompt()
+        except exc.FileNotFound:
+            print ("%(blue)sI seem to have misplaced my keyring... Awkward..."
+                   "%(endc)s") % {"blue": bcolors.OKBLUE, "endc": bcolors.ENDC}
+            print bcolors.WARNING + "No config file found: " + str(
+                self.configFile) + bcolors.ENDC
+            self.raxLoginPrompt()
+
+    def raxLoginPrompt(self):
+        """Prompt the user for a login name and API Key to use for logging
+            into the API."""
+        print ("%(blue)sI really hate to ask...but...can I borrow your key?"
+               "%(endc)s") % {"blue": bcolors.OKBLUE, "endc": bcolors.ENDC}
+        self.raxUser = raw_input('Username: ')
+        self.raxAPIKey = getpass.getpass('API Key: ')
+        try:
+            pyrax.set_credentials(self.raxUser, self.raxAPIKey)
+            print bcolors.OKBLUE + "Authentication SUCCEEDED!" + bcolors.ENDC
+        except exc.AuthenticationFailed:
+            print bcolors.FAIL + "Authentication Failed using the " + \
+                "Username and API Key provided!" + bcolors.ENDC
+            sys.exit(1)
 
 
 def raxCreateInstance():
@@ -138,14 +196,10 @@ if (len(sys.argv) == 1):
     sys.exit()
 
 
-if raxArgs.dfw:
-    dc = 'DFW'
-elif raxArgs.ord:
-    dc = 'ORD'
+if raxArgs.dc:
+    dc = raxArgs.dc
 else:
-    print "%(fail)sMust define the DC!%(endc)s" % {"fail": bcolors.FAIL,
-                                                   "endc": bcolors.ENDC}
-    sys.exit(1)
+    dc = pyrax.safe_region()
 
 print ("%(blue)sWhipping out our janitor's keyring to see if we have "
        "the right key to open the door...%(endc)s") % {"blue": bcolors.OKBLUE,
