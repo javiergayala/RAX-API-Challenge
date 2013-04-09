@@ -175,10 +175,11 @@ __Goal:__ Write a script that creates a CDN-enabled container in Cloud Files.
 __Goal:__ Write a script that will create 2 Cloud Servers and add them as nodes to a new Cloud Load Balancer.
 
 	usage: challenge7.py [-h] [-c CONFIGFILE] [-sn SVRBASENAME] [-si IMGIDTOUSE]
-                     [-sf FLVRIDTOUSE] [-ln LBNAME] [-n NUMSERVERS] [-dfw]
-                     [-ord] [-v] [-V]
+                     [-sf FLVRIDTOUSE] [-ln LBNAME] [-n NUMSERVERS]
+                     [-dc {DFW,ORD,LON}] [-v] [-V]
 
-	Challenge 7 of the API Challenge
+	Challenge 7 of the API Challenge: Write a script that will create 2 Cloud
+	Servers and add them as nodes to a new Cloud Load Balancer.
 
 	optional arguments:
 	  -h, --help            show this help message and exit
@@ -194,8 +195,7 @@ __Goal:__ Write a script that will create 2 Cloud Servers and add them as nodes 
 	                        Name of the load-balacer to create
 	  -n NUMSERVERS, --num-servers NUMSERVERS
 	                        Number of servers to create
-	  -dfw                  Perform action in DFW
-	  -ord                  Perform action in ORD
+	  -dc {DFW,ORD,LON}
 	  -v                    Show debug info, such as HTTP responses
 	  -V, --version         show program's version number and exit
 ## Challenge 8 _(challenge8.py)_ ##
@@ -204,9 +204,13 @@ __Goal:__ Write a script that will create 2 Cloud Servers and add them as nodes 
 __Goal:__ Write a script that will create a static webpage served out of Cloud Files. The script must create a new container, cdn enable it, enable it to serve an index file, create an index file object, upload the object to the container, and create a CNAME record pointing to the CDN URL of the container.
 
 	usage: challenge8.py [-h] [-c CONFIGFILE] -co CONTNAME [-dns DNSDOMAIN]
-                     [-cn CNAME] [-dfw] [-ord] [-v] [-V]
+                     [-cn CNAME] [-dc {DFW,ORD,LON}] [-v] [-V]
 
-	Challenge 8 of the API Challenge
+	Challenge 8 of the API Challenge: Write a script that will create a static
+	webpage served out of Cloud Files. The script must create a new container, cdn
+	enable it, enable it to serve an index file, create an index file object,
+	upload the object to the container, and create a CNAME record pointing to the
+	CDN URL of the container.
 
 	optional arguments:
 	  -h, --help            show this help message and exit
@@ -217,8 +221,32 @@ __Goal:__ Write a script that will create a static webpage served out of Cloud F
 	                        files
 	  -dns DNSDOMAIN        DNS Domain to use
 	  -cn CNAME             CNAME to use
-	  -dfw                  Perform action in DFW
-	  -ord                  Perform action in ORD
+	  -dc {DFW,ORD,LON}
+	  -v                    Show debug info, such as HTTP responses
+	  -V, --version         show program's version number and exit
+## Challenge 9 _(challenge9.py)_ ##
+#### Cloud Servers & Cloud DNS ####
+
+__Goal:__ Write an application that when passed the arguments FQDN, image, and flavor it creates a server of the specified image and flavor with the same name as the fqdn, and creates a DNS entry for the fqdn pointing to the server's public IP
+
+	usage: challenge9.py [-h] [-c CONFIGFILE] [-dc {DFW,ORD,LON}] [-v] [-V]
+                     FQDN domain imgID flvrID
+
+	Write an application that when passed the arguments FQDN, image, and flavor it
+	creates a server of the specified image and flavor with the same name as the
+	fqdn, and creates a DNS entry for the fqdn pointing to the server's public IP
+
+	positional arguments:
+	  FQDN                  FQDN of the server to be created.
+	  domain                Domain name of the server.
+	  imgID                 ID of the Image to use when building the server.
+	  flvrID                ID of the Flavor to use when building the server.
+
+	optional arguments:
+	  -h, --help            show this help message and exit
+	  -c CONFIGFILE, --config CONFIGFILE
+	                        Location of the config file
+	  -dc {DFW,ORD,LON}
 	  -v                    Show debug info, such as HTTP responses
 	  -V, --version         show program's version number and exit
 ## Requirements ##
@@ -226,6 +254,7 @@ __Goal:__ Write a script that will create a static webpage served out of Cloud F
 - Rackspace Cloud Account
 - Python 2.7 or higher
 - pyrax Python Module
+- A pinch of swagger
 
 ## Status ##
 
