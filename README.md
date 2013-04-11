@@ -249,6 +249,48 @@ __Goal:__ Write an application that when passed the arguments FQDN, image, and f
 	  -dc {DFW,ORD,LON}
 	  -v                    Show debug info, such as HTTP responses
 	  -V, --version         show program's version number and exit
+
+## Challenge 10 _(challenge10.py)_ ##
+#### Cloud Servers, Cloud LB, Cloud DNS, Cloud Files ####
+
+__Goal:__ Write an application that will:
+- Create 2 servers, supplying a ssh key to be installed at /root/.ssh/authorized_keys.
+- Create a load balancer
+- Add the 2 new servers to the LB
+- Set up LB monitor and custom error page. 
+- Create a DNS record based on a FQDN for the LB VIP. 
+- Write the error page html to a file in cloud files for backup.
+
+	usage: challenge10.py [-h] [-c CONFIGFILE] [-k SSHKEYFILE] [-sn SVRBASENAME]
+                      [-dc {DFW,ORD,LON}] [-v] [-V]
+                      FQDN domain imgID flvrID cfContainer
+
+	Write an application that when passed the arguments FQDN, image, and flavor it
+	creates a server of the specified image and flavor with the same name as the
+	fqdn, and creates a DNS entry for the fqdn pointing to the server's public IP
+
+	positional arguments:
+	  FQDN                  FQDN of the LB to be created.
+	  domain                Domain name containing the LB.
+	  imgID                 ID of the Image to use when building the server.
+	  flvrID                ID of the Flavor to use when building the server.
+	  cfContainer           Container name to store the LB error page backup.
+
+	optional arguments:
+	  -h, --help            show this help message and exit
+	  -c CONFIGFILE, --config CONFIGFILE
+	                        Location of the config file
+	  -k SSHKEYFILE, --key SSHKEYFILE
+	                        Location of the ssh public key file to be uploaded to
+	                        /root/.ssh/authorized_keys on the newly built server.
+	                        (If one is not specified, then the one embedded in the
+	                        script's 'pubKey' variable is used.)
+	  -sn SVRBASENAME, --server-name SVRBASENAME
+	                        Base name to use when creating the server hostnames
+	                        (i.e. 'web-')
+	  -dc {DFW,ORD,LON}
+	  -v                    Show debug info, such as HTTP responses
+	  -V, --version         show program's version number and exit
 ## Requirements ##
 
 - Rackspace Cloud Account

@@ -24,19 +24,19 @@ import pyrax.utils as utils
 # Pre-defined Variables
 defConfigFile = os.path.expanduser('~') + '/.pyrax.cfg'
 progName = 'RAX Challenge-inator 10,000'
-numServers = 1
+numServers = 2
 metaWeb = 'X-Container-Meta-Web-Index'
 authKeysDest = '/root/.ssh/authorized_keys'
 pubKey = "ssh-dss AAAAB3NzaC1kc3MAAACBAMa7vKRyD1L5z2DUbcapO9/8dLswyAFFZAeb" \
-         "Y88iF2lBsKPZyi51ic8Kb8Ix4uKH0SfM6JkIdF4v0hFRTmoAbUw4Okxi9X7/+IGi" \
+         "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" \
          "MzD7/kRFwwv9w6dD0WCgS+zRQBggsVufMnNfEe9RLAzFHulGNxnfN4yOS276T0sw" \
          "h5mskJlPAAAAFQCCL0+/2tzsCXRmvjh5gO/Jo8Mb2wAAAIAn0MaHFch0hTnzwVuk" \
          "V24VsgrgGl0CAR5ZDAIKxZHfLJTzV/4YOCBtJi4m3yJmDlzXtxmQQTU9ZVi4/m7C" \
          "aFidHmD4z2xUOTsWNO0mp+CxTQMJHUX7oJokERptfCNDxK82eUlrunoj3wrHy7S4" \
          "xamaobAuVeitV5B4K8W24ohXdQAAAIB0/lH/XvKn3qg4MV0cWyUgNyDsU3LKmGFW" \
-         "BB/WWDNW1iPM6lUROgpftXqd1KNw2Rlubw4RHvWrTbRsPxpEW3nSUsKCJJSxhCTK" \
+         "BB/WWDNW1iPM6lUROgpftXqd1KNw2RlubwAbCDefGHiJKLpEW3nSUsKCJJSxhCTK" \
          "uJoT7htfHRLRE26+8y3SnJph2cvza+QbmtMHqLEA1+b8JR/feIadzERRAlpI08S0" \
-         "h+S8iTi//Q== jayala@office101-80.sat.rackspace.com"
+         "h+S8iTi//Q== blah@blah.com"
 errorHtml = """\
 <html>
     <head>
@@ -79,9 +79,10 @@ raxParse.add_argument('flvrID', help="ID of the Flavor to use when building \
     the server.")
 raxParse.add_argument('cfContainer', help="Container name to store the LB \
     error page backup.")
-raxParse.add_argument('-k', '--key', dest='sshKeyFile', help='Location of \
+raxParse.add_argument('-k', '--key', dest='sshKeyFile', help="Location of \
     the ssh public key file to be uploaded to /root/.ssh/authorized_keys \
-    on the newly built server.')
+    on the newly built server. (If one is not specified, then the one \
+    embedded in the script's 'pubKey' variable is used.)")
 raxParse.add_argument('-sn', '--server-name', dest='svrBaseName', help="Base \
     name to use when creating the server hostnames (i.e. 'web-')")
 raxParse.add_argument('-dc', choices=['DFW', 'ORD', 'LON'])
@@ -334,37 +335,10 @@ print "New Cloud LB ID: %s" % newLb.id
 print "\n%(header)sCloud LB Built! Waiting for 'ACTIVE'... %(endc)s" % {
     "header": bcolors.HEADER, "endc": bcolors.ENDC}
 checkLb(newLb)
-# try:
-#     pyrax.utils.wait_until(newLb, "status", ['ACTIVE', 'ERROR'], interval=5,
-#                            attempts=24, verbose=True)
-# except exc.BadResponse:
-#     pyrax.utils.wait_until(newLb, "status", ['ACTIVE', 'ERROR'], interval=5,
-#                            attempts=24, verbose=True)
-# if (str(newLb.status) == 'ACTIVE'):
-#     print("%(head)sCloud Load-balancer is now active!"
-#           "%(endc)s") % {"head": bcolors.HEADER, "endc": bcolors.ENDC}
-#     print bcolors.OKBLUE
-#     print "LB Name: %s" % str(newLb.name)
-#     print "LB Port: %s" % str(newLb.port)
-#     print "Protocol: %s" % str(newLb.protocol)
-#     print "Algorithm: %s" % str(newLb.algorithm)
-#     print "LB IP: %(a)s" % {"a": newLb.virtual_ips[0]}
-#     print bcolors.ENDC
-# elif (str(newLb.status) == 'ERROR') or (str(newLb.status) == 'BUILD'):
-#     print bcolors.FAIL
-#     print("You got a problem, Jack! Your new LB has a status"
-#           " of '%s'!") % str(newLb.status)
-#     print "LB Name: %s" % str(newLb.name)
-#     print bcolors.WARN
-#     print "Debug Info:"
-#     print str(newLb)
-#     print bcolors.ENDC
 
-# chgLb = raxCldLB.get(newLb.id)
 print "\n%(header)sSetting Custom Cloud LB Error Page! %(endc)s" % {
     "header": bcolors.HEADER, "endc": bcolors.ENDC}
 try:
-    # chgLb.set_error_page(errorHtml)
     newLb.manager.set_error_page(newLb, errorHtml)
 except Exception as e:
     print "\n%(fail)sERROR Setting Custom CLB Error Page: %(e)s %(endc)s" % {
