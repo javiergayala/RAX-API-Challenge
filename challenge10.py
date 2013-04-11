@@ -237,7 +237,7 @@ def raxAddDNSA(lbIp):
     return newRecord
 
 
-def checkLb():
+def checkLb(newLb):
     try:
         pyrax.utils.wait_until(newLb, "status", ['ACTIVE', 'ERROR'],
                                interval=5, attempts=24, verbose=True)
@@ -333,7 +333,7 @@ print "New Cloud LB ID: %s" % newLb.id
 
 print "\n%(header)sCloud LB Built! Waiting for 'ACTIVE'... %(endc)s" % {
     "header": bcolors.HEADER, "endc": bcolors.ENDC}
-checkLb()
+checkLb(newLb)
 # try:
 #     pyrax.utils.wait_until(newLb, "status", ['ACTIVE', 'ERROR'], interval=5,
 #                            attempts=24, verbose=True)
@@ -369,7 +369,7 @@ try:
 except Exception as e:
     print "\n%(fail)sERROR Setting Custom CLB Error Page: %(e)s %(endc)s" % {
         "fail": bcolors.FAIL, "e": e, "endc": bcolors.ENDC}
-checkLb()
+checkLb(newLb)
 
 print "\n%(header)sCreating Cloud LB Health Monitor! %(endc)s" % {
     "header": bcolors.HEADER, "endc": bcolors.ENDC}
