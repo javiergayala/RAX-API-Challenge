@@ -291,12 +291,59 @@ __Goal:__ Write an application that will:
 	  -dc {DFW,ORD,LON}
 	  -v                    Show debug info, such as HTTP responses
 	  -V, --version         show program's version number and exit
+## Challenge 11 _(challenge11.py)_ ##
+#### Cloud Networks, Cloud Servers, Cloud LB, ####
+#### Cloud DNS, Cloud Block Storage ####
+
+__Goal:__ Write an application that will:
+- Create an SSL terminated load balancer (Create self-signed certificate.)
+- Create a DNS record that should be pointed to the load balancer.
+- Create Three servers as nodes behind the LB.
+- Each server should have a CBS volume attached to it. (Size and type are irrelevant.)
+- All three servers should have a private Cloud Network shared between them.
+- Login information to all three servers returned in a readable format as the result of the script, including connection information.
+	
+	usage: challenge11.py [-h] [-c CONFIGFILE] [-sn SVRBASENAME] [-crt CRTFILE]
+	                      [-key KEYFILE] [-dc {DFW,ORD,LON}] [-v] [-V]
+	                      FQDN domain imgID flvrID
+
+	Write an application that when passed the arguments FQDN, image, and flavor it
+	creates a server of the specified image and flavor with the same name as the
+	fqdn, and creates a DNS entry for the fqdn pointing to the server's public IP
+
+	positional arguments:
+	  FQDN                  FQDN of the LB to be created.
+	  domain                Domain name containing the LB.
+	  imgID                 ID of the Image to use when building the server.
+	  flvrID                ID of the Flavor to use when building the server.
+
+	optional arguments:
+	  -h, --help            show this help message and exit
+	  -c CONFIGFILE, --config CONFIGFILE
+	                        Location of the config file
+	  -sn SVRBASENAME, --server-name SVRBASENAME
+	                        Base name to use when creating the server hostnames
+	                        (i.e. 'web-')
+	  -crt CRTFILE, --cert-file CRTFILE
+	                        Location of the file containing the SSL CRT. If not
+	                        defined, the value will default to 'challenge11.crt'.
+	  -key KEYFILE, --key-file KEYFILE
+	                        Location of the file containing the SSL KEY. If not
+	                        defined, the value will default to 'challenge11.key'.
+	  -dc {DFW,ORD,LON}
+	  -v                    Show debug info, such as HTTP responses
+	  -V, --version         show program's version number and exit
 ## Requirements ##
 
 - Rackspace Cloud Account
 - Python 2.7 or higher
 - pyrax Python Module
 - A pinch of swagger
+
+## Miscellaneous ##
+
+- When using a script that requires an Image ID, I used '__acf05b3c-5403-4cf0-900c-9b12b0db0644__' in my testing.  This is the Image ID for '_CentOS 5.8_'
+- When using a script that requires a Flavor ID, I used '__2__' in my testing.  This is the Flavor ID for a 512MB cloud server.
 
 ## Status ##
 
