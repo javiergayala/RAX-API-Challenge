@@ -201,7 +201,6 @@ def raxAddDNSA(lbIp):
         domid = raxDns.find(name=raxArgs.domain)
     except Exception as e:
         raise Exception(e)
-    print "Type: %s" % type(lbIp)
     print "Creating DNS Record"
     aRec = [{
         "type": "A",
