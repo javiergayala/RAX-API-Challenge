@@ -23,7 +23,7 @@ import pyrax
 import pyrax.exceptions as exc
 
 # Pre-defined Variables
-defConfigFile = os.path.expanduser('~') + '/.pyrax.cfg'
+defConfigFile = os.path.expanduser('~') + '/.rackspace_cloud_credentials'
 progName = 'RAX Challenge-inator 4000'
 
 # Argument Parsing

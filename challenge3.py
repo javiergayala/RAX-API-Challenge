@@ -22,7 +22,7 @@ import getpass
 import time
 
 # Pre-defined Variables
-defConfigFile = os.path.expanduser('~') + '/.pyrax.cfg'
+defConfigFile = os.path.expanduser('~') + '/.rackspace_cloud_credentials'
 progName = 'RAX Challenge-inator 3000'
 
 # Argument Parsing

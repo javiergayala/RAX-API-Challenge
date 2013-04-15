@@ -22,7 +22,7 @@ import pyrax
 import pyrax.exceptions as exc
 import pyrax.utils as utils
 # Pre-defined Variables
-defConfigFile = os.path.expanduser('~') + '/.pyrax.cfg'
+defConfigFile = os.path.expanduser('~') + '/.rackspace_cloud_credentials'
 progName = 'RAX Challenge-inator 10,000'
 numServers = 2
 metaWeb = 'X-Container-Meta-Web-Index'

@@ -20,7 +20,7 @@ import getpass
 import pyrax
 import pyrax.exceptions as exc
 # Pre-defined Variables
-defConfigFile = os.path.expanduser('~') + '/.pyrax.cfg'
+defConfigFile = os.path.expanduser('~') + '/.rackspace_cloud_credentials'
 progName = 'RAX Challenge-inator 8000'
 metaWeb = 'X-Container-Meta-Web-Index'
 indexFile = 'index.html'
