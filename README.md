@@ -333,10 +333,25 @@ __Goal:__ Write an application that will:
 	  -dc {DFW,ORD,LON}
 	  -v                    Show debug info, such as HTTP responses
 	  -V, --version         show program's version number and exit
+## Challenge 12 _(challenge12.rb)_ ##
+#### Mailgun API ####
+
+__Goal:__ Write an application that will create a route in mailgun so that when an email is sent to <YourSSO>@apichallenges.mailgun.org it calls your Challenge 1 script that builds 3 servers.
+__Assumptions__: 
+Assume that challenge 1 can be kicked off by accessing http://cldsrvr.com/challenge1 (I am aware this doesn't work. You just need to make sure that your message is getting posted to that URL)
+
+	Usage: challenge12.rb [options]
+	    -h, --help                       Help
+	    -v, --version                    Version Info
+	    -l, --list-routes                List Routes
+	    -c, --create-route               Create Route
+	    -k, --api-key APIKEY             API Key
+	    -m, --mailbox MAILBOX            Mailbox name
 ## Requirements ##
 
 - Rackspace Cloud Account
 - Python 2.7 or higher
+- Ruby (for Challenge 12)
 - pyrax Python Module
 - A pinch of swagger
 
